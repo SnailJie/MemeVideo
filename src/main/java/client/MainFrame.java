@@ -50,10 +50,9 @@ public class MainFrame extends JFrame{
 	          
 	          
 	        //Video List
-			//leftPanel
 			DefaultListModel<String> titleList=new DefaultListModel();
-			titleList.addElement("avengers-featurehp");
-			titleList.addElement("B");
+			titleList.addElement("avengers-featurehp.mp4");
+			titleList.addElement("prometheus-featureukFhp.mp4");
 			JList<String> list=new JList<String>(titleList);
 			JScrollPane scp=new JScrollPane(list);
 			contentPane.add(scp,BorderLayout.WEST);
@@ -86,6 +85,7 @@ public class MainFrame extends JFrame{
 	            public void mouseClicked(MouseEvent e) {  
 	                // TODO Auto-generated method stub  
 //	                PlayerMain.stop();  
+	            	playerComponent.getMediaPlayer().stop();
 	            }  
 	        });  
 	        controlPanel.add(btnStop);  
@@ -96,8 +96,8 @@ public class MainFrame extends JFrame{
 	            @Override  
 	            public void mouseClicked(MouseEvent e) {  
 	                // TODO Auto-generated method stub  
-	            	playerComponent.getMediaPlayer().playMedia("avengers-featurehp.mp4");// please
-	        		
+	            	//playerComponent.getMediaPlayer().playMedia("avengers-featurehp.mp4");// please
+	            	playerComponent.getMediaPlayer().playMedia(list.getSelectedValue());
 	            }  
 	        });  
 	        controlPanel.add(btnPlay);  
@@ -109,6 +109,7 @@ public class MainFrame extends JFrame{
 	            public void mouseClicked(MouseEvent e) {  
 	                // TODO Auto-generated method stub  
 //	                PlayerMain.pause();  
+	            	playerComponent.getMediaPlayer().pause();
 	            }  
 	        });  
 	        controlPanel.add(btnPause);  

@@ -5,7 +5,7 @@
 
 This program is developed in Ubuntu 14.04
 
-# run
+# Run
 
 * Please install VLC media player client for Ubuntu.
 * Import program to Eclipse
