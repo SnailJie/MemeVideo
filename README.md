@@ -1,9 +1,14 @@
-# vlcj-swt-swing
-Example showing how to use vlcj and SWT embedded in a Swing application
+# Environmental requirements
 
-## Important
-Check the pom.xml for the architecture-specific dependencies for SWT.
+* Linux 64-bit
+* VLC media player 
 
-At the present time, this project defaults to 64-bit Linux.
+This program is developed in Ubuntu 14.04
 
-Other changes may need to be made for other platforms.
+# run
+
+* Please install VLC media player client for Ubuntu.
+* Import program to Eclipse
+
+	 File-> import-> Maven->Existing Maven projects
+ 
