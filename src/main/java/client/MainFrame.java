@@ -108,7 +108,7 @@ public class MainFrame extends JFrame{
 	            @Override  
 	            public void mouseClicked(MouseEvent e) {  
 	                // TODO Auto-generated method stub  
-	                PlayerMain.pause();  
+//	                PlayerMain.pause();  
 	            }  
 	        });  
 	        controlPanel.add(btnPause);  
