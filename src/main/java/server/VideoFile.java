@@ -1,6 +1,8 @@
 package server;
 
-public class VideoFile {
+import java.io.Serializable;
+
+public class VideoFile implements Serializable {
 
 	private String id;
 	private String title;
