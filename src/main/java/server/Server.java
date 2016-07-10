@@ -78,7 +78,8 @@ public class Server {
 		// TODO Auto-generated method stub
     	 int length = 0;
     	DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-         File file = new File("1.mp4");
+//         File file = new File("1.mp4");
+    	File file = new File(title);
          FileInputStream fis = new FileInputStream(file);
          byte[] sendBytes = new byte[1024];
          while ((length = fis.read(sendBytes, 0, sendBytes.length)) > 0) {
