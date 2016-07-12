@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -24,6 +25,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -38,19 +40,18 @@ public class MainFrame extends JFrame {
 
 	private JPanel contentPane;  
 	public DefaultListModel<String> titleList;
-
 	private JPanel panel;  
-
 	private JPanel progressPanel;  
 	private JPanel controlPanel;  
 	private JButton btnStop, btnPlay, btnPause; 
 	static String IP = "127.0.0.1";
 	static int PORT = 1234;
-	Socket server;
-	ObjectInputStream in;
-	PrintWriter out;
-
-	EmbeddedMediaPlayerComponent playerComponent;  
+	private Socket server;
+	private ObjectInputStream in;
+	private PrintWriter out;
+	private BufferedReader infoIn ;
+	private String selectVideoTitle = null;
+	private EmbeddedMediaPlayerComponent playerComponent;  
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -71,25 +72,10 @@ public class MainFrame extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 
-		// init Socket
-
-		try {
-			server = new Socket(IP, PORT);
-			in = new ObjectInputStream(server.getInputStream());
-			out = new PrintWriter(server.getOutputStream());
-			// BufferedReader wt = new BufferedReader(new
-		} catch (UnknownHostException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-
+		
 		titleList = new DefaultListModel();
 		JList<String> list = new JList<String>(titleList);
 
-		// Get Video List
 		JPanel listPanel = new JPanel();
 		listPanel.setLayout(new BorderLayout());
 		// listPanel.setLayout(new FlowLayout(1));
@@ -100,32 +86,13 @@ public class MainFrame extends JFrame {
 		getListBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				// List<VideoFile> videoList;
-				
+				connectServer();
 				out.println("GetList");
 				out.flush();
-				VideoList videoback = new VideoList();
-				try {
-					videoback = (VideoList) in.readObject();
-					List<VideoFile> videoList = videoback.getVideoList();
-
-					for (int i = 0; i < videoList.size(); i++) {
-						titleList.addElement(videoList.get(i).getFilename());
-					}
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (ClassNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
+				getVideoList(titleList);
 			}
-
 		});
 
-		// Video List
 
 		JScrollPane scp = new JScrollPane(list);
 		scp.setSize(190, 500);
@@ -156,8 +123,6 @@ public class MainFrame extends JFrame {
 		btnStop.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				// PlayerMain.stop();
 				playerComponent.getMediaPlayer().stop();
 			}
 		});
@@ -167,20 +132,20 @@ public class MainFrame extends JFrame {
 		btnPlay.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				String selectName = list.getSelectedValue();
-				out.println(selectName);
-				out.flush();
-				System.out.println("send list"+list.getSelectedValue());
+				selectVideoTitle = list.getSelectedValue();
+				if (selectVideoTitle==null) {
+					JOptionPane.showMessageDialog(null, "Please select a video", " Error ", JOptionPane.ERROR_MESSAGE);
+				}
+				else{
+					out.println(selectVideoTitle);
+					out.flush();
+					recvFile(server,selectVideoTitle);
+					playerComponent.getMediaPlayer().playMedia(selectVideoTitle);//
+				}
 				
-				recvFile(server,selectName);
-				playerComponent.getMediaPlayer().playMedia(selectName);//
-				// please
-
-				
-				
-//				playerComponent.getMediaPlayer().playMedia(list.getSelectedValue());
 			}
+
+			
 		});
 		controlPanel.add(btnPlay);
 
@@ -188,8 +153,6 @@ public class MainFrame extends JFrame {
 		btnPause.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				// PlayerMain.pause();
 				playerComponent.getMediaPlayer().pause();
 			}
 		});
@@ -213,7 +176,6 @@ public class MainFrame extends JFrame {
                 dis = new DataInputStream(socket.getInputStream());
                 fos = new FileOutputStream(new File(name));
                 inputByte = new byte[1024];
-                System.out.println("Start recive file...");
                 while ((length = dis.read(inputByte, 0, inputByte.length)) > 0) {
                     System.out.println(length);
                     fos.write(inputByte, 0, length);
@@ -231,5 +193,57 @@ public class MainFrame extends JFrame {
         } catch (Exception e) {
         }
     }
+    
+    private void getVideoList(DefaultListModel<String> titleList)   {
+		// TODO Auto-generated method stub
+    	try {
+			if(infoIn.readLine().equals("Nothing")) {
+				JOptionPane.showMessageDialog(null, "No videos are available ", " ERROR ", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		} catch (HeadlessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	VideoList videoback = new VideoList();
+		try {
+			videoback = (VideoList) in.readObject();
+			List<VideoFile> videoList = videoback.getVideoList();
+
+			for (int i = 0; i < videoList.size(); i++) {
+				titleList.addElement(videoList.get(i).getFilename());
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+    
+    private void connectServer() {
+    	try {
+			server = new Socket(IP, PORT);
+			in = new ObjectInputStream(server.getInputStream());
+			out = new PrintWriter(server.getOutputStream());
+			infoIn= new BufferedReader(new InputStreamReader(server.getInputStream()));
+			// BufferedReader wt = new BufferedReader(new
+		} catch (UnknownHostException e2) {
+			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, "UnknownHost,Please check IP address ", " Connection Fail ", JOptionPane.ERROR_MESSAGE);
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, "Please ensure server is avaliable  ", " Connection Fail ", JOptionPane.ERROR_MESSAGE);
+			e2.printStackTrace();
+		}
+
+	}
 
 }
