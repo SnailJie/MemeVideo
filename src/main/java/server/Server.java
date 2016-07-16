@@ -35,21 +35,28 @@ public class Server {
 			PrintWriter infoOut = new PrintWriter(client.getOutputStream());
 			// Recv choosed video
 			while (true) {
+				System.out.println("waiting");
 				String str = in.readLine();
+				
 				if (str.equals("GetList")) {
 					if (getList().size() != 0) {
 						infoOut.println("ReplyList");
 						infoOut.flush();
+						System.out.println("Ready send list");
 						VideoList videoList = new VideoList();
 						videoList.setVideoList(getList());
 						out.writeObject(videoList);
 						out.flush();
+						System.out.println(" send list over");
+						
 					} else {
+						System.out.println("Ready send list nothing");
 						infoOut.println("Nothing");
 						infoOut.flush();
 					}
 				}
 				else {
+					System.out.println("Ready send file");
 					sendFile(client, str);
 				}
 
@@ -64,8 +71,8 @@ public class Server {
 	private static void sendFile(Socket socket, String title) throws IOException {
 		int length = 0;
 		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-		// File file = new File("1.mp4");
-		File file = new File(title);
+		 File file = new File("1.mp4");
+		//File file = new File(title);
 		FileInputStream fis = new FileInputStream(file);
 		byte[] sendBytes = new byte[1024];
 		while ((length = fis.read(sendBytes, 0, sendBytes.length)) > 0) {
