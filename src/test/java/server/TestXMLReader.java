@@ -6,7 +6,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-public class XMLReaderTest {
+import server.Server;
+import server.VideoFile;
+import server.XMLReader;
+
+public class TestXMLReader {
 
 	private XMLReader reader;
 	private List<VideoFile> videoList;
