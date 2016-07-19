@@ -1,15 +1,17 @@
-# Prerequirement
+# Prerequirements
 
-* Ubuntu 14.04 64-bit 
-* VLC media player 
+* windows 7 64-bit 
+* VLC media player for windows 64-bit 
 
-This program is developed in Ubuntu 14.04
+ 
 
 # Install
 
 * Install 
 
-Please install VLC media player client for Ubuntu from http://www.videolan.org/vlc/download-ubuntu.html. You can follow the Installation the Command line way to install VCL.
+Please install VLC media player client at C:\VLC for [**windows7 64-bit**](http://www.videolan.org/vlc/download-windows.html). 
+
+>Notice: Please choose installer for 64 bit version
 
 * Import 
 
@@ -17,6 +19,15 @@ Please install VLC media player client for Ubuntu from http://www.videolan.org/v
 	* Import project to Eclipse
 	
 		 File-> import-> Maven->Existing Maven projects
+		 
+* Environment setting
+ 
+ VLC_PLUGIN_PATH:  C:\VLC\plugins
+ Path:   C:\VLC\plugins;
+ 
+ reboot your computer after set environment variable.
+ 
+
 		 
 		 
 # Run
