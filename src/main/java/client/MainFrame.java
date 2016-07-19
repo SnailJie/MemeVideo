@@ -31,29 +31,35 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import com.sun.jna.NativeLibrary;
+
 import server.VideoFile;
 import server.VideoList;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
+import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 public class MainFrame extends JFrame {
 
-	private JPanel contentPane;  
+	private JPanel contentPane;
 	public DefaultListModel<String> titleList;
-	private JPanel panel;  
-	private JPanel progressPanel;  
-	private JPanel controlPanel;  
-	private JButton btnStop, btnPlay, btnPause; 
+	private JPanel panel;
+	private JPanel progressPanel;
+	private JPanel controlPanel;
+	private JButton btnStop, btnPlay, btnPause;
 	static String IP = "127.0.0.1";
 	static int PORT = 1234;
 	private Socket server;
 	private ObjectInputStream in;
 	private PrintWriter out;
-	private BufferedReader infoIn ;
+	private BufferedReader infoIn;
 	private String selectVideoTitle = null;
-	private EmbeddedMediaPlayerComponent playerComponent;  
+	private EmbeddedMediaPlayerComponent playerComponent;
 
 	public static void main(String[] args) {
+		String NATIVE_LIBRARY_SEARCH_PATH = "C:\\VLC";
+		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), NATIVE_LIBRARY_SEARCH_PATH);
+
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -72,7 +78,6 @@ public class MainFrame extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 
-		
 		titleList = new DefaultListModel();
 		JList<String> list = new JList<String>(titleList);
 
@@ -89,11 +94,10 @@ public class MainFrame extends JFrame {
 				connectServer();
 				out.println("GetList");
 				out.flush();
-				SocketUtil.getVideoList(infoIn,in,titleList);
-				
+				SocketUtil.getVideoList(infoIn, in, titleList);
+
 			}
 		});
-
 
 		JScrollPane scp = new JScrollPane(list);
 		scp.setSize(190, 500);
@@ -110,14 +114,13 @@ public class MainFrame extends JFrame {
 		playerComponent = new EmbeddedMediaPlayerComponent();
 		videoPane.add(playerComponent);
 
-
-		panel = new JPanel();  
+		panel = new JPanel();
 		videoPane.add(panel, BorderLayout.SOUTH);
 
-		progressPanel = new JPanel();  
+		progressPanel = new JPanel();
 		panel.add(progressPanel, BorderLayout.NORTH);
 
-		controlPanel = new JPanel();  
+		controlPanel = new JPanel();
 		panel.add(controlPanel, BorderLayout.SOUTH);
 
 		btnStop = new JButton("STOP");
@@ -134,20 +137,18 @@ public class MainFrame extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				selectVideoTitle = list.getSelectedValue();
-				if (selectVideoTitle==null) {
+				if (selectVideoTitle == null) {
 					JOptionPane.showMessageDialog(null, "Please select a video", " Error ", JOptionPane.ERROR_MESSAGE);
-				}
-				else{
+				} else {
 					out.println(selectVideoTitle);
 					out.flush();
-					SocketUtil.recvFile(server,selectVideoTitle);
-					
+					SocketUtil.recvFile(server, selectVideoTitle);
+
 					playerComponent.getMediaPlayer().playMedia(selectVideoTitle);//
 				}
-				
+
 			}
 
-			
 		});
 		controlPanel.add(btnPlay);
 
@@ -165,25 +166,23 @@ public class MainFrame extends JFrame {
 	public EmbeddedMediaPlayer getMediaPlayer() {
 		return playerComponent.getMediaPlayer();
 	}
-	
-	
-    
-    
-    
-    private void connectServer() {
-    	try {
+
+	private void connectServer() {
+		try {
 			server = new Socket(IP, PORT);
 			in = new ObjectInputStream(server.getInputStream());
 			out = new PrintWriter(server.getOutputStream());
-			infoIn= new BufferedReader(new InputStreamReader(server.getInputStream()));
+			infoIn = new BufferedReader(new InputStreamReader(server.getInputStream()));
 			// BufferedReader wt = new BufferedReader(new
 		} catch (UnknownHostException e2) {
 			// TODO Auto-generated catch block
-			JOptionPane.showMessageDialog(null, "UnknownHost,Please check IP address ", " Connection Fail ", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "UnknownHost,Please check IP address ", " Connection Fail ",
+					JOptionPane.ERROR_MESSAGE);
 			e2.printStackTrace();
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
-			JOptionPane.showMessageDialog(null, "Please ensure server is avaliable  ", " Connection Fail ", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Please ensure server is avaliable  ", " Connection Fail ",
+					JOptionPane.ERROR_MESSAGE);
 			e2.printStackTrace();
 		}
 
